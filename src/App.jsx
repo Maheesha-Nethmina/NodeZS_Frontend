@@ -9,7 +9,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
-        {/* We will add the Dashboard route next */}
+        {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
+
       </Routes>
     </Router>
   );
