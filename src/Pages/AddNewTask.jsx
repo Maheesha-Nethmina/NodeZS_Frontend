@@ -12,7 +12,6 @@ function AddNewTask() {
         description: "",
         priority: "MEDIUM", 
         dueDate: ""
-        // REMOVED: assigneeEmail 
     });
 
     const [loading, setLoading] = useState(false);
@@ -23,16 +22,23 @@ function AddNewTask() {
         setLoading(true); 
         setError("");
 
-        // Format the payload to match Backend expectations
+        // CRITICAL UPDATE: Format the payload to include the logged-in User's ID
         const taskPayload = {
             title: task.title,
             description: task.description,
             priority: task.priority,
-            // Format date for LocalDateTime or send null if empty [cite: 56, 70]
+            // Requirement: Save creator's ID
+            userId: user?.id, 
+            // Format date for LocalDateTime or send null if empty
             dueDate: task.dueDate ? `${task.dueDate}T00:00:00` : null
         };
 
         try {
+            // Check if user session exists before sending
+            if (!user?.id) {
+                throw new Error("User session not found. Please log in again.");
+            }
+
             const response = await saveTask(taskPayload);
             
             if (response.code === "00") {

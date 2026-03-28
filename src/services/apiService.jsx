@@ -53,6 +53,7 @@ export const getCurrentUser = () => {
 
 /**
  * Creates a new task with title, description, priority, and due date.
+ * Ensure taskData includes userId as per the critical update.
  */
 export const saveTask = async (taskData) => {
     try {
@@ -81,10 +82,13 @@ export const getAllTasks = async () => {
  * NEW: Fetches tasks with pagination support.
  * Returns 10 tasks per page by default.
  */
-export const getAllTasksPaged = async (page = 0, size = 10) => {
+export const getAllTasksPaged = async (page = 0, size = 10, status = '') => {
     try {
         // Requirement: Use appropriate HTTP methods (GET) and structured JSON
-        const response = await axios.get(`${BASE_URL}/task/getAllPaged?page=${page}&size=${size}`);
+        let url = `${BASE_URL}/task/getAllPaged?page=${page}&size=${size}`;
+        if (status) url += `&status=${status}`;
+        
+        const response = await axios.get(url);
         return response.data;
     } catch (error) {
         // Requirement: Graceful error handling
@@ -107,5 +111,42 @@ export const updateTaskStatus = async (taskid, status, email) => {
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : new Error("Update failed");
+    }
+};
+
+/**
+ * Fetches tasks assigned to a specific email with pagination.
+ * powers the Selection and MyTasks pages.
+ */
+export const getMyTasksPaged = async (email, page = 0, size = 10) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/task/getMyTasks?email=${email}&page=${page}&size=${size}`);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error("Failed to load your tasks");
+    }
+};
+
+/**
+ * For update task details in edit task page.
+ */
+export const updateTask = async (taskData) => {
+    try {
+        const response = await axios.put(`${BASE_URL}/task/update`, taskData);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error("Update failed");
+    }
+};
+
+/**
+ * For delete task in my task page.
+ */
+export const deleteTask = async (taskid) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/task/delete/${taskid}`);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error("Delete failed");
     }
 };
