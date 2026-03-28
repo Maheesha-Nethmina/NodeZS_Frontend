@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Single base URL as requested [cite: 22]
+// Single base URL as requested
 const BASE_URL = "http://localhost:8080/api/v1";
 
 // --- USER AUTHENTICATION & SESSION MANAGEMENT ---
@@ -10,7 +10,7 @@ export const register = async (name, email, password) => {
         const response = await axios.post(`${BASE_URL}/user/save`, { name, email, password });
         return response.data;
     } catch (error) {
-        // Requirement: Informative error messages [cite: 43, 49, 66]
+        // Requirement: Informative error messages
         throw error.response ? error.response.data : new Error("Server connection failed");
     }
 };
@@ -20,7 +20,7 @@ export const login = async (email, password) => {
         const response = await axios.post(`${BASE_URL}/user/login`, { email, password });
         
         if (response.data && response.data.code === "00") {
-            // response.data.content includes {id, name, email} [cite: 37]
+            // response.data.content includes {id, name, email}
             localStorage.setItem("user", JSON.stringify(response.data.content));
             
             if (response.data.token) {
@@ -34,7 +34,7 @@ export const login = async (email, password) => {
 };
 
 export const logout = () => {
-    // Clear all session data [cite: 80]
+    // Clear all session data
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 };
@@ -42,33 +42,31 @@ export const logout = () => {
 export const getCurrentUser = () => {
     const user = localStorage.getItem("user");
     try {
-        // Safely parse the stored user object [cite: 67]
+        // Safely parse the stored user object
         return user ? JSON.parse(user) : null;
     } catch (e) {
         return null;
     }
 };
 
-// --- TASK MANAGEMENT (Requirement 3.1) ---
+// --- TASK MANAGEMENT ---
 
 /**
  * Creates a new task with title, description, priority, and due date.
- * [cite: 31]
  */
 export const saveTask = async (taskData) => {
     try {
-        // Requirement: Use appropriate HTTP methods (POST) [cite: 46]
+        // Requirement: Use appropriate HTTP methods (POST)
         const response = await axios.post(`${BASE_URL}/task/save`, taskData);
         return response.data;
     } catch (error) {
-        // Requirement: User-visible error messages 
+        // Requirement: User-visible error messages
         throw error.response ? error.response.data : new Error("Failed to save task");
     }
 };
 
 /**
- * Fetches all tasks. Sorting and filtering can be added via query params.
- * [cite: 32]
+ * Fetches all tasks (Non-paged).
  */
 export const getAllTasks = async () => {
     try {
@@ -76,5 +74,38 @@ export const getAllTasks = async () => {
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : new Error("Failed to fetch tasks");
+    }
+};
+
+/**
+ * NEW: Fetches tasks with pagination support.
+ * Returns 10 tasks per page by default.
+ */
+export const getAllTasksPaged = async (page = 0, size = 10) => {
+    try {
+        // Requirement: Use appropriate HTTP methods (GET) and structured JSON
+        const response = await axios.get(`${BASE_URL}/task/getAllPaged?page=${page}&size=${size}`);
+        return response.data;
+    } catch (error) {
+        // Requirement: Graceful error handling
+        throw error.response ? error.response.data : new Error("Failed to load paged tasks");
+    }
+};
+
+/**
+ * UPDATED: Update task status AND assignee email.
+ * This is used when a user "Assigns" a task to themselves via the checkbox.
+ */
+export const updateTaskStatus = async (taskid, status, email) => {
+    try {
+        // Requirement 46: Use PUT for updates
+        const response = await axios.put(`${BASE_URL}/task/updateStatus`, {
+            taskid: taskid,
+            status: status,
+            assigneeEmail: email // Added email to payload to update database
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error("Update failed");
     }
 };
