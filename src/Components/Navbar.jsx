@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../services/authService'; // Verify if it's authServices or authService
+import { logout } from '../services/apiService';
 
 const Navbar = ({ user }) => {
   const navigate = useNavigate();
