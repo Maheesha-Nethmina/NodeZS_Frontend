@@ -7,7 +7,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   
-  // State for Tasks and Pagination
+  // State for Tasks and Pagination 
   const [tasks, setTasks] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -15,10 +15,10 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   // Corrected State for Filtering and Sorting
-  const [filterStatus, setFilterStatus] = useState(''); // Default: All Statuses
-  const [sortBy, setSortBy] = useState('dueDate');      // Default: Due Date
+  const [filterStatus, setFilterStatus] = useState(''); //  All Statuses display default
+  const [sortBy, setSortBy] = useState('dueDate');      //  Due Date sorting default
 
-  // EFFECT 1: Load user on mount
+  // identity current user and redirection logic
   useEffect(() => {
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -28,13 +28,11 @@ function Dashboard() {
     }
   }, [navigate]);
 
-  /**
-   * Fetch tasks logic
-   */
+  //fetch tasks list, filterStatus, or sortBy changes
   const fetchTasks = async (pageNumber) => {
     setLoading(true);
     try {
-      // Logic: Pass filterStatus and sortBy to backend
+      // display filterStatus and sortBy to backend
       const response = await getAllTasksPaged(pageNumber, 10, filterStatus, sortBy);
       if (response.code === "00") {
         setTasks(response.content.tasks);
@@ -49,14 +47,15 @@ function Dashboard() {
     }
   };
 
-  // EFFECT 2: FIXED BUG
-  // Added 'user' to the dependency array. 
-  // Now, as soon as setUser(currentUser) finishes, this will trigger the initial load.
+//  Refreshes the task list whenever the user, filter, or sorting method changes.
   useEffect(() => {
     if (user) {
-      fetchTasks(0);
+      fetchTasks(0);// Always reset to page 0 when filters/sort change
     }
   }, [user, filterStatus, sortBy]); 
+
+  // Handles assigning an unassigned task to the current user.
+  // Triggered when the checkbox is clicked.
 
   const handleAssignChange = async (taskid, isChecked, taskTitle) => {
     if (isChecked) {
@@ -85,7 +84,7 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-slate-900">Task Management Dashboard</h1>
         </header>
 
-        {/* Info & Stats Cards */}
+        {/*user information display */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">Welcome back, {user?.name}!</h2>
@@ -106,7 +105,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* --- FILTER & SORT BAR --- */}
+        {/* --- filters and sorting --- */}
         <div className="bg-white p-5 mb-6 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-8 items-center">
             <div className="flex gap-3 items-center">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Status Filter</label>
@@ -135,7 +134,7 @@ function Dashboard() {
             </div>
         </div>
 
-        {/* --- TASK LIST TABLE --- */}
+        {/* --- display task list --- */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
                 <h3 className="text-xl font-bold text-slate-800">Your Task List</h3>
