@@ -11,23 +11,28 @@ function MyTask() {
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    // NEW: State for Editing
+    // State for Editing
     const [editingTask, setEditingTask] = useState(null);
 
     useEffect(() => {
         const currentUser = getCurrentUser();
+        
+        // Console log user data as requested
+        console.log("Current session user:", currentUser);
+
         if (!currentUser) {
             navigate('/login');
         } else {
             setUser(currentUser);
-            fetchMyTasks(currentUser.email, 0);
+            // Passing currentUser.id to fetch tasks created by this specific ID
+            fetchMyTasks(currentUser.id, 0);
         }
     }, [navigate]);
 
-    const fetchMyTasks = async (email, pageNumber) => {
+    const fetchMyTasks = async (userId, pageNumber) => {
         setLoading(true);
         try {
-            const response = await getMyTasksPaged(email, pageNumber, 10);
+            const response = await getMyTasksPaged(userId, pageNumber, 10);
             if (response.code === "00") {
                 setTasks(response.content.tasks);
                 setTotalPages(response.content.totalPages);
@@ -46,7 +51,6 @@ function MyTask() {
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Ensure date is formatted for LocalDateTime if it was changed
             const updatedData = {
                 ...editingTask,
                 dueDate: editingTask.dueDate?.includes('T') 
@@ -58,7 +62,7 @@ function MyTask() {
             if (res.code === "00") {
                 alert("Task updated successfully!");
                 setEditingTask(null);
-                fetchMyTasks(user.email, currentPage); // Refresh the list
+                fetchMyTasks(user.id, currentPage); 
             }
         } catch (err) {
             alert("Failed to update task: " + (err.message || "Unknown error"));
@@ -66,7 +70,7 @@ function MyTask() {
     };
 
     /**
-     * NEW: Handles task deletion with confirmation
+     * Handles task deletion with confirmation
      */
     const handleDeleteTask = async (taskid, title) => {
         const confirmDelete = window.confirm(`Are you sure you want to delete the task: "${title}"?`);
@@ -76,7 +80,7 @@ function MyTask() {
                 const res = await deleteTask(taskid);
                 if (res.code === "00") {
                     alert("Task deleted successfully!");
-                    fetchMyTasks(user.email, currentPage); // Refresh the current page
+                    fetchMyTasks(user.id, currentPage); 
                 }
             } catch (err) {
                 alert("Failed to delete task: " + (err.message || "Unknown error"));
@@ -92,13 +96,14 @@ function MyTask() {
                 <header className="mb-8 flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900">My Personal Tasks</h1>
-                        <p className="text-gray-500 mt-1">Tasks assigned to: <span className="font-semibold text-indigo-600">{user?.email}</span></p>
+                        {/* Removed ID from UI, kept only name */}
+                        <p className="text-gray-500 mt-1">Viewing tasks created by: <span className="font-semibold text-indigo-600">{user?.name}</span></p>
                     </div>
                     <button 
                         onClick={() => navigate('/dashboard')}
                         className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
                     >
-                        &larr; Global Dashboard
+                        &larr; Back to Dashboard
                     </button>
                 </header>
 
@@ -168,7 +173,7 @@ function MyTask() {
                                     <th className="px-6 py-4 border-b">Priority</th>
                                     <th className="px-6 py-4 border-b">Status</th>
                                     <th className="px-6 py-4 border-b text-center">Due Date</th>
-                                    <th className="px-6 py-4 border-b text-center">Actions</th>
+                                    <th className="px-6 py-4 border-b text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 text-sm">
@@ -217,7 +222,7 @@ function MyTask() {
                                 ) : (
                                     <tr>
                                         <td colSpan="5" className="px-6 py-20 text-center text-gray-400 font-medium">
-                                            You haven't assigned any tasks to yourself yet.
+                                            You haven't created any tasks yet.
                                         </td>
                                     </tr>
                                 )}
@@ -232,14 +237,14 @@ function MyTask() {
                         </div>
                         <div className="flex gap-3">
                             <button 
-                                onClick={() => fetchMyTasks(user.email, currentPage - 1)} 
+                                onClick={() => fetchMyTasks(user.id, currentPage - 1)} 
                                 disabled={currentPage === 0 || loading} 
                                 className="px-4 py-2 text-xs font-bold border border-gray-200 rounded-lg bg-white disabled:opacity-30"
                             >
                                 Prev
                             </button>
                             <button 
-                                onClick={() => fetchMyTasks(user.email, currentPage + 1)} 
+                                onClick={() => fetchMyTasks(user.id, currentPage + 1)} 
                                 disabled={currentPage >= totalPages - 1 || loading} 
                                 className="px-4 py-2 text-xs font-bold border border-gray-200 rounded-lg bg-white disabled:opacity-30"
                             >

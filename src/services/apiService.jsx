@@ -118,12 +118,13 @@ export const updateTaskStatus = async (taskid, status, email) => {
  * Fetches tasks assigned to a specific email with pagination.
  * powers the Selection and MyTasks pages.
  */
-export const getMyTasksPaged = async (email, page = 0, size = 10) => {
+export const getMyTasksPaged = async (userId, page = 0, size = 10) => {
     try {
-        const response = await axios.get(`${BASE_URL}/task/getMyTasks?email=${email}&page=${page}&size=${size}`);
+        // Updated query parameter key to userId
+        const response = await axios.get(`${BASE_URL}/task/getMyTasks?userId=${userId}&page=${page}&size=${size}`);
         return response.data;
     } catch (error) {
-        throw error.response ? error.response.data : new Error("Failed to load your tasks");
+        throw error.response ? error.response.data : new Error("Failed to load tasks");
     }
 };
 
@@ -148,5 +149,14 @@ export const deleteTask = async (taskid) => {
         return response.data;
     } catch (error) {
         throw error.response ? error.response.data : new Error("Delete failed");
+    }
+};
+//fetch assigned tasks for selection page by email
+export const getAssignedTasksPaged = async (email, page = 0, size = 10) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/task/getAssignedTasks?email=${email}&page=${page}&size=${size}`);
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : new Error("Failed to load assigned tasks");
     }
 };
