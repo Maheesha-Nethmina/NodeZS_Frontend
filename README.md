@@ -99,7 +99,6 @@ The API will be running on `http://localhost:8080`.
 ---
 
 ##  Known Limitations & Future Improvements
-* **Advanced Security:** While basic login is implemented, a future goal is integrating Spring Security with JWT.
 * **Real-time Search:** A planned enhancement is a debounced search bar to filter tasks by keywords.
 * **Database-Level Slicing:** Currently, sorting is done in-memory. For scalability, I would move this to database-level `OrderBy` queries via `Pageable`.
 * **User Interface (UI) Refinement:** I plan to replace basic loading text with CSS Skeleton Screens and add Framer Motion animations. This will create smoother transitions when tasks change states and provide a more polished, modern feel.
