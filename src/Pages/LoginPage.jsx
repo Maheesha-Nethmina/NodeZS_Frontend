@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { login } from '../services/authService';
+import { login } from '../services/apiService';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -10,14 +10,25 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        e.preventDefault();
+        // Stop default browser form submission [cite: 19]
+        if (e) e.preventDefault(); 
+        
         setLoading(true);
         setError("");
+
         try {
-            await login(email, password);
-            navigate("/dashboard");
+            const data = await login(email, password);
+            
+            if (data.code === "00") {
+                // Successful login redirect [cite: 81]
+                navigate("/dashboard");
+            } else {
+                setError(data.message || "Invalid credentials.");
+            }
         } catch (err) {
-            setError("Invalid email or password. Please try again.");
+            // Requirement: User-visible error messages [cite: 43]
+            setError(err.message || "Login failed. Please check your connection.");
+        } finally {
             setLoading(false);
         }
     };
@@ -41,8 +52,8 @@ const LoginPage = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                         <input 
                             type="email" 
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                            placeholder="maheeshanethmina@gmail.com"
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="user@example.com"
                             value={email} 
                             onChange={(e) => setEmail(e.target.value)} 
                             required 
@@ -52,7 +63,7 @@ const LoginPage = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                         <input 
                             type="password" 
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none"
                             placeholder="••••••••"
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
@@ -63,7 +74,7 @@ const LoginPage = () => {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-colors duration-200 disabled:bg-indigo-400"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg disabled:bg-indigo-400"
                     >
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
