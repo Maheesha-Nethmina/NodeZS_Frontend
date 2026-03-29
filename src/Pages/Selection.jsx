@@ -40,14 +40,13 @@ function Selection() {
     };
 
     /**
-     * NEW: Handles marking a task as DONE
+     * Handles marking a task as DONE
      */
     const handleStatusChange = async (taskid, isChecked, taskTitle) => {
         if (isChecked) {
             const confirmDone = window.confirm(`Mark "${taskTitle}" as completed?`);
             if (confirmDone) {
                 try {
-                    // Reusing updateTaskStatus to set status to DONE
                     const res = await updateTaskStatus(taskid, "DONE", user?.email);
                     if (res.code === "00") {
                         fetchAssignedTasks(user.email, currentPage);
@@ -56,6 +55,28 @@ function Selection() {
                     console.error("Failed to update status:", err);
                     alert("Could not mark task as completed.");
                 }
+            }
+        }
+    };
+
+    /**
+     * NEW: Handles unassigning/canceling a task selection
+     * Sends an empty email string and TODO status to the backend
+     */
+    const handleRemoveSelection = async (taskid, taskTitle) => {
+        const confirmRemove = window.confirm(`Are you sure you want to remove "${taskTitle}" from your selections? This task will be available for others to pick up.`);
+        
+        if (confirmRemove) {
+            try {
+                // Sending "" as email to trigger the unassign logic in backend
+                const res = await updateTaskStatus(taskid, "TODO", "");
+                if (res.code === "00") {
+                    alert("Task unassigned successfully.");
+                    fetchAssignedTasks(user.email, currentPage);
+                }
+            } catch (err) {
+                console.error("Failed to remove task selection:", err);
+                alert("Could not remove task selection.");
             }
         }
     };
@@ -92,11 +113,12 @@ function Selection() {
                                     <th className="px-6 py-4 border-b">Priority</th>
                                     <th className="px-6 py-4 border-b">Status</th>
                                     <th className="px-6 py-4 border-b text-center">Due Date</th>
+                                    <th className="px-6 py-4 border-b text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 text-sm">
                                 {loading ? (
-                                    <tr><td colSpan="5" className="px-6 py-12 text-center text-gray-400 animate-pulse font-medium">Loading assigned tasks...</td></tr>
+                                    <tr><td colSpan="6" className="px-6 py-12 text-center text-gray-400 animate-pulse font-medium">Loading assigned tasks...</td></tr>
                                 ) : tasks.length > 0 ? (
                                     tasks.map((task) => (
                                         <tr key={task.taskid} className={`hover:bg-indigo-50/20 transition-colors font-medium ${task.status === 'DONE' ? 'opacity-60 bg-gray-50/50' : ''}`}>
@@ -131,11 +153,20 @@ function Selection() {
                                             <td className="px-6 py-4 text-center text-gray-500 italic">
                                                 {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
                                             </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <button
+                                                    onClick={() => handleRemoveSelection(task.taskid, task.title)}
+                                                    disabled={task.status === 'DONE'}
+                                                    className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-tighter disabled:opacity-0 transition-all"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-20 text-center text-gray-400 font-medium">
+                                        <td colSpan="6" className="px-6 py-20 text-center text-gray-400 font-medium">
                                             No assigned tasks found.
                                         </td>
                                     </tr>
