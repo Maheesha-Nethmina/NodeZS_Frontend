@@ -19,6 +19,7 @@ This application evaluates clean code, sensible design, and attention to detail 
 * **Task Updates:** Update any field of an existing task or mark it as "Done" to automatically record a completion timestamp.
 * **User Assignment:** Assign tasks to specific users via email and view a filtered list of personal assignments.
 * **Task Unassignment:** A custom feature allowing users to remove themselves from a selection, resetting the task to "To Do" for others to pick up.
+* **Security & Authentication:** Implemented a Token-based Authentication system. For user security, I used the BCrypt Password Hashing algorithm to ensure that no plain-text passwords are ever stored in the database..
 
 
 ##  Tech Stack
