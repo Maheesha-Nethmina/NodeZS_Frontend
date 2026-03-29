@@ -1,10 +1,9 @@
 import axios from 'axios';
 
-// Single base URL as requested
+// Single base URL
 const BASE_URL = "http://localhost:8080/api/v1";
 
-// --- USER AUTHENTICATION & SESSION MANAGEMENT ---
-
+// for user registration and login
 export const register = async (name, email, password) => {
     try {
         const response = await axios.post(`${BASE_URL}/user/save`, { name, email, password });
@@ -49,26 +48,20 @@ export const getCurrentUser = () => {
     }
 };
 
-// --- TASK MANAGEMENT ---
 
-/**
- * Creates a new task with title, description, priority, and due date.
- * Ensure taskData includes userId as per the critical update.
- */
+// For creating a new task
 export const saveTask = async (taskData) => {
     try {
-        // Requirement: Use appropriate HTTP methods (POST)
+        // Use appropriate HTTP methods (POST)
         const response = await axios.post(`${BASE_URL}/task/save`, taskData);
         return response.data;
     } catch (error) {
-        // Requirement: User-visible error messages
+        // User-visible error messages
         throw error.response ? error.response.data : new Error("Failed to save task");
     }
 };
 
-/**
- * Fetches all tasks (Non-paged).
- */
+//display all tasks in dashboard page
 export const getAllTasks = async () => {
     try {
         const response = await axios.get(`${BASE_URL}/task/getAll`);
@@ -78,10 +71,7 @@ export const getAllTasks = async () => {
     }
 };
 
-/**
- * NEW: Fetches tasks with pagination support.
- * Returns 10 tasks per page by default.
- */
+//fetch all tasks with pagination for dashboard page
 export const getAllTasksPaged = async (page = 0, size = 10, status = '', sortBy = 'dueDate') => {
     try {
         let url = `${BASE_URL}/task/getAllPaged?page=${page}&size=${size}&sortBy=${sortBy}`;
@@ -94,17 +84,14 @@ export const getAllTasksPaged = async (page = 0, size = 10, status = '', sortBy 
     }
 };
 
-/**
- * UPDATED: Update task status AND assignee email.
- * This is used when a user "Assigns" a task to themselves via the checkbox.
- */
+// For updating task status when marking as done or unassigning
 export const updateTaskStatus = async (taskid, status, email) => {
     try {
-        // Requirement 46: Use PUT for updates
+        // Use PUT for updates
         const response = await axios.put(`${BASE_URL}/task/updateStatus`, {
             taskid: taskid,
             status: status,
-            assigneeEmail: email // Added email to payload to update database
+            assigneeEmail: email 
         });
         return response.data;
     } catch (error) {
@@ -112,10 +99,7 @@ export const updateTaskStatus = async (taskid, status, email) => {
     }
 };
 
-/**
- * Fetches tasks assigned to a specific email with pagination.
- * powers the Selection and MyTasks pages.
- */
+//fetch tasks created by the logged in user with pagination for my task page
 export const getMyTasksPaged = async (userId, page = 0, size = 10) => {
     try {
         // Updated query parameter key to userId
@@ -126,9 +110,7 @@ export const getMyTasksPaged = async (userId, page = 0, size = 10) => {
     }
 };
 
-/**
- * For update task details in edit task page.
- */
+// For updating task details in my task page
 export const updateTask = async (taskData) => {
     try {
         const response = await axios.put(`${BASE_URL}/task/update`, taskData);
@@ -138,9 +120,7 @@ export const updateTask = async (taskData) => {
     }
 };
 
-/**
- * For delete task in my task page.
- */
+// For deleting a task in my task page
 export const deleteTask = async (taskid) => {
     try {
         const response = await axios.delete(`${BASE_URL}/task/delete/${taskid}`);

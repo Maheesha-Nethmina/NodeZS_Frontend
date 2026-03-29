@@ -4,6 +4,8 @@ import { getCurrentUser, getMyTasksPaged, updateTask, deleteTask } from '../serv
 import Navbar from '../Components/Navbar';
 
 function MyTask() {
+
+    // manage states
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [tasks, setTasks] = useState([]);
@@ -17,18 +19,18 @@ function MyTask() {
     useEffect(() => {
         const currentUser = getCurrentUser();
         
-        // Console log user data as requested
+        // for displaying the name of the user who created the task
         console.log("Current session user:", currentUser);
 
         if (!currentUser) {
             navigate('/login');
         } else {
             setUser(currentUser);
-            // Passing currentUser.id to fetch tasks created by this specific ID
+            // Passing currentUser.id to fetch tasks created by this user
             fetchMyTasks(currentUser.id, 0);
         }
     }, [navigate]);
-
+//handle pagination and fetching tasks for the logged-in user
     const fetchMyTasks = async (userId, pageNumber) => {
         setLoading(true);
         try {
@@ -45,9 +47,9 @@ function MyTask() {
         }
     };
 
-    /**
-     * Handles the update submission
-     */
+    
+    // Handles the update submission
+    
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -69,9 +71,7 @@ function MyTask() {
         }
     };
 
-    /**
-     * Handles task deletion with confirmation
-     */
+//   Handles task deletion with confirmation
     const handleDeleteTask = async (taskid, title) => {
         const confirmDelete = window.confirm(`Are you sure you want to delete the task: "${title}"?`);
         
@@ -96,10 +96,10 @@ function MyTask() {
                 <header className="mb-8 flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900">My Personal Tasks</h1>
-                        {/* Removed ID from UI, kept only name */}
                         <p className="text-gray-500 mt-1">Viewing tasks created by: <span className="font-semibold text-indigo-600">{user?.name}</span></p>
                     </div>
                     <button 
+                    // set destination
                         onClick={() => navigate('/dashboard')}
                         className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
                     >
@@ -107,7 +107,7 @@ function MyTask() {
                     </button>
                 </header>
 
-                {/* --- EDIT MODAL --- */}
+                {/*for editing task*/}
                 {editingTask && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-100">
@@ -163,7 +163,7 @@ function MyTask() {
                     </div>
                 )}
 
-                {/* --- DATA TABLE --- */}
+                {/*Display Tasks */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -230,7 +230,7 @@ function MyTask() {
                         </table>
                     </div>
 
-                    {/* Pagination */}
+                    {/* Pagination  one page should display 10 records only*/}
                     <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
                         <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                             Page {currentPage + 1} of {totalPages || 1}

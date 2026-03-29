@@ -10,7 +10,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        // Stop default browser form submission [cite: 19]
+        // Stop default browser form submission
         if (e) e.preventDefault(); 
         
         setLoading(true);
@@ -20,13 +20,13 @@ const LoginPage = () => {
             const data = await login(email, password);
             
             if (data.code === "00") {
-                // Successful login redirect [cite: 81]
+                // Successful login redirect
                 navigate("/dashboard");
             } else {
                 setError(data.message || "Invalid credentials.");
             }
         } catch (err) {
-            // Requirement: User-visible error messages [cite: 43]
+            //User-visible error messages
             setError(err.message || "Login failed. Please check your connection.");
         } finally {
             setLoading(false);

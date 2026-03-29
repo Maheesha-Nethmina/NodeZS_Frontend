@@ -6,7 +6,7 @@ const Navbar = ({ user }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Requirement: Attention to detail / Confirmation step
+    //Attention to detail / Confirmation step
     if (window.confirm("Are you sure you want to logout?")) {
       logout();
       navigate('/login');
@@ -15,7 +15,7 @@ const Navbar = ({ user }) => {
 
   return (
     <nav className="flex items-center justify-between bg-slate-800 px-8 py-4 text-white shadow-md">
-      {/* Left side: Logged in user's name */}
+      {/*Logged in user's name */}
       <div className="text-lg font-medium flex items-center gap-2">
         <span className="text-slate-400">Welcome,</span> 
         <span className="font-bold text-blue-400">
@@ -23,7 +23,7 @@ const Navbar = ({ user }) => {
         </span>
       </div>
       
-      {/* Right side: Logout button only */}
+      {/*Logout button  */}
       <div className="flex items-center">
         <button 
           onClick={handleLogout}

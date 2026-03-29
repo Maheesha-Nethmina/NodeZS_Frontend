@@ -4,9 +4,12 @@ import Navbar from '../Components/Navbar';
 import { getCurrentUser, saveTask } from '../services/apiService';
 
 function AddNewTask() {
+
+    // Hooks for navigation and session management
     const navigate = useNavigate();
     const user = getCurrentUser();
-    
+
+    // state management for form inputs, loading state, and error messages    
     const [task, setTask] = useState({
         title: "",
         description: "",
@@ -22,14 +25,12 @@ function AddNewTask() {
         setLoading(true); 
         setError("");
 
-        // CRITICAL UPDATE: Format the payload to include the logged-in User's ID
+        // added userid to idetify the creator of the task
         const taskPayload = {
             title: task.title,
             description: task.description,
             priority: task.priority,
-            // Requirement: Save creator's ID
             userId: user?.id, 
-            // Format date for LocalDateTime or send null if empty
             dueDate: task.dueDate ? `${task.dueDate}T00:00:00` : null
         };
 

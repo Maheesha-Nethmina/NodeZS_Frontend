@@ -3,10 +3,12 @@ import { register } from '../services/apiService';
 import { useNavigate, Link } from 'react-router-dom';
 
 const RegisterPage = () => {
+    // Holds all registration input fields in a single object state
     const [formData, setFormData] = useState({ name: "", email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Handles the form submission for when creating a new user account.
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);

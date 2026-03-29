@@ -39,9 +39,7 @@ function Selection() {
         }
     };
 
-    /**
-     * Handles marking a task as DONE
-     */
+    // task status change handler for marking tasks as done
     const handleStatusChange = async (taskid, isChecked, taskTitle) => {
         if (isChecked) {
             const confirmDone = window.confirm(`Mark "${taskTitle}" as completed?`);
@@ -59,16 +57,12 @@ function Selection() {
         }
     };
 
-    /**
-     * NEW: Handles unassigning/canceling a task selection
-     * Sends an empty email string and TODO status to the backend
-     */
+    //confirmation before removing task selection and unassigning it from the user
     const handleRemoveSelection = async (taskid, taskTitle) => {
         const confirmRemove = window.confirm(`Are you sure you want to remove "${taskTitle}" from your selections? This task will be available for others to pick up.`);
         
         if (confirmRemove) {
             try {
-                // Sending "" as email to trigger the unassign logic in backend
                 const res = await updateTaskStatus(taskid, "TODO", "");
                 if (res.code === "00") {
                     alert("Task unassigned successfully.");
