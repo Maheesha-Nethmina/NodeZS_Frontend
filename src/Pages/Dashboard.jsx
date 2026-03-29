@@ -18,9 +18,9 @@ function Dashboard() {
   const [filterStatus, setFilterStatus] = useState(''); // Default: All Statuses
   const [sortBy, setSortBy] = useState('dueDate');      // Default: Due Date
 
+  // EFFECT 1: Load user on mount
   useEffect(() => {
     const currentUser = getCurrentUser();
-    
     if (!currentUser) {
       navigate('/login');
     } else {
@@ -29,14 +29,12 @@ function Dashboard() {
   }, [navigate]);
 
   /**
-   * Fetch tasks with specific sorting: 
-   * Due Date = Ascending (Soonest first)
-   * Priority = High -> Medium -> Low (Handled by Backend logic)
+   * Fetch tasks logic
    */
   const fetchTasks = async (pageNumber) => {
     setLoading(true);
     try {
-      // Pass pageNumber, pageSize, status filter, and sortBy to the API
+      // Logic: Pass filterStatus and sortBy to backend
       const response = await getAllTasksPaged(pageNumber, 10, filterStatus, sortBy);
       if (response.code === "00") {
         setTasks(response.content.tasks);
@@ -51,12 +49,14 @@ function Dashboard() {
     }
   };
 
-  // Trigger fetch when status filter or sorting selection changes
+  // EFFECT 2: FIXED BUG
+  // Added 'user' to the dependency array. 
+  // Now, as soon as setUser(currentUser) finishes, this will trigger the initial load.
   useEffect(() => {
     if (user) {
       fetchTasks(0);
     }
-  }, [filterStatus, sortBy]);
+  }, [user, filterStatus, sortBy]); 
 
   const handleAssignChange = async (taskid, isChecked, taskTitle) => {
     if (isChecked) {
@@ -92,18 +92,8 @@ function Dashboard() {
             <p className="text-gray-500">You are logged in with <strong>{user?.email}</strong>.</p>
             <div className="mt-8 flex gap-4">
               <button onClick={() => navigate('/add-task')} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">+ Create New Task</button>
-              
-              <button onClick={() => navigate('/my-tasks')}
-                className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors"
-              >
-                My Tasks
-              </button>
-
-              <button onClick={() => navigate('/selection')}
-                className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors"
-              >
-                Selection
-              </button>
+              <button onClick={() => navigate('/my-tasks')} className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors">My Tasks</button>
+              <button onClick={() => navigate('/selection')} className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors">Selection</button>
             </div>
           </div>
 
@@ -116,7 +106,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* --- REFINED FILTER & SORT BAR --- */}
+        {/* --- FILTER & SORT BAR --- */}
         <div className="bg-white p-5 mb-6 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-8 items-center">
             <div className="flex gap-3 items-center">
                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Status Filter</label>
