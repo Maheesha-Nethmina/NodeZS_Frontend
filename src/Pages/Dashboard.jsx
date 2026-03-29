@@ -15,7 +15,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   // Corrected State for Filtering and Sorting
-  const [filterStatus, setFilterStatus] = useState(''); // Default: All
+  const [filterStatus, setFilterStatus] = useState(''); // Default: All Statuses
   const [sortBy, setSortBy] = useState('dueDate');      // Default: Due Date
 
   useEffect(() => {
@@ -31,13 +31,12 @@ function Dashboard() {
   /**
    * Fetch tasks with specific sorting: 
    * Due Date = Ascending (Soonest first)
-   * Priority = High -> Medium -> Low
+   * Priority = High -> Medium -> Low (Handled by Backend logic)
    */
   const fetchTasks = async (pageNumber) => {
     setLoading(true);
     try {
-      // We pass the sortBy to the API. 
-      // The backend Controller logic we wrote handles the internal ASC/DESC direction.
+      // Pass pageNumber, pageSize, status filter, and sortBy to the API
       const response = await getAllTasksPaged(pageNumber, 10, filterStatus, sortBy);
       if (response.code === "00") {
         setTasks(response.content.tasks);
@@ -52,7 +51,7 @@ function Dashboard() {
     }
   };
 
-  // Trigger fetch when any filter or sort option changes
+  // Trigger fetch when status filter or sorting selection changes
   useEffect(() => {
     if (user) {
       fetchTasks(0);
@@ -92,17 +91,14 @@ function Dashboard() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">Welcome back, {user?.name}!</h2>
             <p className="text-gray-500">You are logged in with <strong>{user?.email}</strong>.</p>
             <div className="mt-8 flex gap-4">
-              {/* move to add task page */}
               <button onClick={() => navigate('/add-task')} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">+ Create New Task</button>
               
-              {/* move to my task page */}
               <button onClick={() => navigate('/my-tasks')}
                 className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 My Tasks
               </button>
 
-              {/* NEW: move to selection page */}
               <button onClick={() => navigate('/selection')}
                 className="border border-gray-200 hover:bg-gray-50 text-gray-600 px-6 py-2 rounded-lg font-medium transition-colors"
               >
@@ -145,7 +141,6 @@ function Dashboard() {
                 >
                     <option value="dueDate">Due Date (Soonest first)</option>
                     <option value="priority">Priority (High to Low)</option>
-                    <option value="createdAt">Newest Created</option>
                 </select>
             </div>
         </div>

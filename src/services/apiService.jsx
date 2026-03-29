@@ -82,17 +82,15 @@ export const getAllTasks = async () => {
  * NEW: Fetches tasks with pagination support.
  * Returns 10 tasks per page by default.
  */
-export const getAllTasksPaged = async (page = 0, size = 10, status = '') => {
+export const getAllTasksPaged = async (page = 0, size = 10, status = '', sortBy = 'dueDate') => {
     try {
-        // Requirement: Use appropriate HTTP methods (GET) and structured JSON
-        let url = `${BASE_URL}/task/getAllPaged?page=${page}&size=${size}`;
+        let url = `${BASE_URL}/task/getAllPaged?page=${page}&size=${size}&sortBy=${sortBy}`;
         if (status) url += `&status=${status}`;
         
         const response = await axios.get(url);
         return response.data;
     } catch (error) {
-        // Requirement: Graceful error handling
-        throw error.response ? error.response.data : new Error("Failed to load paged tasks");
+        throw error.response ? error.response.data : new Error("Failed to load tasks");
     }
 };
 
